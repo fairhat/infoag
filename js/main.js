@@ -6,7 +6,11 @@
  * @version 0.0.2
  *
  */
-var LEERTASTE = 32;
+var LEERTASTE = 32,
+    LINKS = 37,
+    RECHTS = 39;
+
+var SCHWERKRAFT = true;
 
 
 /**
@@ -43,14 +47,36 @@ var vogel = canvas.display.sprite({
 var boden = canvas.display.image({
    x: 0,
    y: canvas.height - 112,
-   image: "img/ground.png"
+   image: "img/ground.png",
+   zaehler: 0,
+   dx: -5
 });
+
+/**
+ * Animationen für die Sprites
+ */
+var animationen = function(){
+    // VOGEL
+    if(vogel.dy < 0)vogel.frame = 1;
+    else if(vogel.dy == 0)vogel.frame = 2;
+    else vogel.frame = 3;
+
+    // BODEN
+    if(boden.zaehler == 8) {
+        boden.x = 0;
+        boden.zaehler = 0;
+    }
+    else {
+        boden.x += boden.dx;
+        boden.zaehler++;
+    }
+};
 
 /**
  * Schwerkraft - Bsp.: Vogel wird nach unten gezogen
  */
 var schwerkraft = function() {
-    vogel.dy += 1; // Schwerkraftsvariable
+    if(SCHWERKRAFT)vogel.dy += 1; // Schwerkraftsvariable
 };
 
 /**
@@ -58,14 +84,19 @@ var schwerkraft = function() {
  */
 var bewegungen = function() {
   schwerkraft();
-  vogel.x += vogel.dx; // vogel bewegt sich um .dx auf der X-Achse
+
+  // vogel.x += vogel.dx; // vogel bewegt sich um .dx auf der X-Achse
   vogel.y += vogel.dy; // vogel bewegt sich um .dy auf der Y-Achse
 };
 
+/**
+ * Abfragen, bspw., ob der Vogel das Spielfeld verlässt (oder auch Kollisionen mit anderen Objekten)
+ */
 var abfragen = function() {
-  if(vogel.y >= canvas.height)
+  if(vogel.y >= boden.y - vogel.height)
   {
-      vogel.y = 0;
+      vogel.y = boden.y - vogel.height;
+      SCHWERKRAFT = false;
       vogel.dy = 0;
   }
 };
@@ -77,6 +108,7 @@ canvas.addChild(vogel); // vogel hinzufügen
 var schleife = function () {
     abfragen();
     bewegungen();
+    animationen();
 };
 
 canvas.bind("keydown", function (taste) {
