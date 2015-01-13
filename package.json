@@ -1,0 +1,19 @@
+{
+    "name": "diesterag",
+    "version": "0.0.2",
+    "description": "Informatik AG - Flappy Bird Klon",
+    "author": "Ferhat Topcu <fearhat.de>",
+    "contributors": [{
+        "name": "Ferhat Topcu",
+        "email": "topcu.ft@gmail.com"
+    }],
+    "main": "js/main.js",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/fearhat/infoag"
+    },
+    "preferGlobal": true,
+    "private": true,
+    "analyze": true,
+    "license": "WTFPL"
+}
