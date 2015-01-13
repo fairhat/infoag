@@ -13,7 +13,7 @@ var LEERTASTE = 32,
 var GAME = true;
 var X_ENDE = 0;
 var Y_ENDE = 0;
-
+var rohre = [];
 
 /**
  * @description Canvas - "Spielfeld" wird erstellt
@@ -55,9 +55,9 @@ var rohrObenPrototyp = spielfeld.display.image({
     height: 350,
     image: "img/pipe_down.png",
     dx: 0
-});
+}),
 
-var rohrUntenPrototyp = spielfeld.display.image({
+    rohrUntenPrototyp = spielfeld.display.image({
     x: X_ENDE-50,
     y: Y_ENDE-250,
     width: 45,
@@ -66,6 +66,44 @@ var rohrUntenPrototyp = spielfeld.display.image({
     dx: 0,
     zIndex: 5
 });
+
+function rohrErstellen(params)
+{
+    var randomNumber = Math.floor(Math.random() * 201) - 100;
+    var xOffset = +200;
+    var rohrOben = rohrObenPrototyp.clone({
+        x: params.x + xOffset,
+        y: params.y1 + randomNumber
+    });
+
+    var rohrUnten = rohrUntenPrototyp.clone({
+       x: params.x + xOffset,
+       y: params.y2 + randomNumber
+    });
+
+    rohre.push([rohrOben,rohrUnten]);
+    spielfeld.addChild(rohrOben);
+    spielfeld.addChild(rohrUnten);
+}
+
+for(var i = 0; i<=5; i++)
+{
+    if(i==0){
+        rohrErstellen({
+            x: X_ENDE+500,
+            y1: -180,
+            y2: Y_ENDE-250
+        })
+    }else {
+        console.log(rohre[i-1][0].x);
+        rohrErstellen({
+                x: rohre[i-1][0].x,
+                y1: -180,
+                y2: Y_ENDE - 250
+            })
+    }
+}
+
 
 /**
  * @name Boden
@@ -115,6 +153,16 @@ var schwerkraft = function() {
 var bewegungen = function() {
   schwerkraft();
 
+  // ROHRE
+  if(GAME) {
+      for (var i = 0; i < rohre.length; i++) {
+          for (var j = 0; j < rohre[i].length; j++) {
+              rohre[i][j].dx = -5;
+              rohre[i][j].x += rohre[i][j].dx;
+          }
+      }
+  }
+
   // vogel.x += vogel.dx; // vogel bewegt sich um .dx auf der X-Achse
   vogel.y += vogel.dy; // vogel bewegt sich um .dy auf der Y-Achse
 };
@@ -132,11 +180,6 @@ var abfragen = function() {
 };
 
 spielfeld.addChild(vogel); // vogel hinzufügen
-
-spielfeld.addChild(rohrUntenPrototyp);
-spielfeld.addChild(rohrObenPrototyp);
-
-
 spielfeld.addChild(boden); // boden hinzufügen
 
 
