@@ -84,6 +84,7 @@ var schwerkraft = function() {
  */
 var bewegungen = function() {
   schwerkraft();
+    // geht das hier?
 
   // vogel.x += vogel.dx; // vogel bewegt sich um .dx auf der X-Achse
   vogel.y += vogel.dy; // vogel bewegt sich um .dy auf der Y-Achse
