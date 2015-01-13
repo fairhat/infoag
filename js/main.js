@@ -10,24 +10,29 @@ var LEERTASTE = 32,
     LINKS = 37,
     RECHTS = 39;
 
-var SCHWERKRAFT = true;
+var GAME = true;
+var X_ENDE = 0;
+var Y_ENDE = 0;
 
 
 /**
  * @description Canvas - "Spielfeld" wird erstellt
  */
-var canvas = oCanvas.create({
+var spielfeld = oCanvas.create({
     canvas: "#spiel",
     background: "img/bg.png"
 });
+
+X_ENDE = spielfeld.width;
+Y_ENDE = spielfeld.height;
 
 /**
  * @name Vogel
  * @description Vogel-Objekt für das Spielfeld
  */
-var vogel = canvas.display.sprite({
-    x: canvas.width / 5,
-    y: canvas.height / 4,
+var vogel = spielfeld.display.sprite({
+    x: X_ENDE / 5,
+    y: Y_ENDE / 4,
     image: "img/bird.png",
     generate: true,
     width: 34,
@@ -38,18 +43,41 @@ var vogel = canvas.display.sprite({
     frame: 1
 });
 
-// vogel zusätzliche attribute
+/**
+ * @name Rohrprototypen
+ * @type Object
+ * @description Blaupausen für die Rohre
+ */
+var rohrObenPrototyp = spielfeld.display.image({
+    x: X_ENDE-50,
+    y: 0-180,
+    width: 45,
+    height: 350,
+    image: "img/pipe_down.png",
+    dx: 0
+});
+
+var rohrUntenPrototyp = spielfeld.display.image({
+    x: X_ENDE-50,
+    y: Y_ENDE-250,
+    width: 45,
+    height: 350,
+    image: "img/pipe_up.png",
+    dx: 0,
+    zIndex: 5
+});
 
 /**
  * @name Boden
  * @description Boden des Spielfeldes
  */
-var boden = canvas.display.image({
+var boden = spielfeld.display.image({
    x: 0,
-   y: canvas.height - 112,
+   y: Y_ENDE - 112,
    image: "img/ground.png",
    zaehler: 0,
-   dx: -5
+   dx: -5,
+   zIndex: 99
 });
 
 /**
@@ -62,13 +90,15 @@ var animationen = function(){
     else vogel.frame = 3;
 
     // BODEN
-    if(boden.zaehler == 8) {
-        boden.x = 0;
-        boden.zaehler = 0;
-    }
-    else {
-        boden.x += boden.dx;
-        boden.zaehler++;
+    if(GAME) {
+        if (boden.zaehler == 8) {
+            boden.x = 0;
+            boden.zaehler = 0;
+        }
+        else {
+            boden.x += boden.dx;
+            boden.zaehler++;
+        }
     }
 };
 
@@ -76,7 +106,7 @@ var animationen = function(){
  * Schwerkraft - Bsp.: Vogel wird nach unten gezogen
  */
 var schwerkraft = function() {
-    if(SCHWERKRAFT)vogel.dy += 1; // Schwerkraftsvariable
+    if(GAME)vogel.dy += 1; // Schwerkraftsvariable
 };
 
 /**
@@ -84,7 +114,6 @@ var schwerkraft = function() {
  */
 var bewegungen = function() {
   schwerkraft();
-    // geht das hier?
 
   // vogel.x += vogel.dx; // vogel bewegt sich um .dx auf der X-Achse
   vogel.y += vogel.dy; // vogel bewegt sich um .dy auf der Y-Achse
@@ -97,13 +126,18 @@ var abfragen = function() {
   if(vogel.y >= boden.y - vogel.height)
   {
       vogel.y = boden.y - vogel.height;
-      SCHWERKRAFT = false;
+      GAME = false; // gameover
       vogel.dy = 0;
   }
 };
 
-canvas.addChild(boden); // boden hinzufügen
-canvas.addChild(vogel); // vogel hinzufügen
+spielfeld.addChild(vogel); // vogel hinzufügen
+
+spielfeld.addChild(rohrUntenPrototyp);
+spielfeld.addChild(rohrObenPrototyp);
+
+
+spielfeld.addChild(boden); // boden hinzufügen
 
 
 var schleife = function () {
@@ -112,7 +146,7 @@ var schleife = function () {
     animationen();
 };
 
-canvas.bind("keydown", function (taste) {
+spielfeld.bind("keydown", function (taste) {
     if(taste.which === LEERTASTE){
         vogel.dy = -10; // vogel springt hoch
     }
@@ -120,7 +154,7 @@ canvas.bind("keydown", function (taste) {
 
 
 // startet die Schleife
-canvas.setLoop(schleife);
+spielfeld.setLoop(schleife);
 // Timeline starten
-canvas.timeline.start();
+spielfeld.timeline.start();
 
