@@ -14,6 +14,8 @@ var GAME = true;
 var X_ENDE = 0;
 var Y_ENDE = 0;
 var rohre = [];
+var score = 0;
+var scoreGezeigt = false;
 
 /**
  * @description Canvas - "Spielfeld" wird erstellt
@@ -54,7 +56,9 @@ var rohrObenPrototyp = spielfeld.display.image({
     width: 45,
     height: 350,
     image: "img/pipe_down.png",
-    dx: 0
+    dx: 0,
+	type: 0,
+	punkt: false
 }),
 
     rohrUntenPrototyp = spielfeld.display.image({
@@ -64,7 +68,9 @@ var rohrObenPrototyp = spielfeld.display.image({
     height: 350,
     image: "img/pipe_up.png",
     dx: 0,
-    zIndex: 5
+    zIndex: 5,
+	type: 1,
+	punkt: false
 });
 
 function rohrErstellen(params)
@@ -73,12 +79,20 @@ function rohrErstellen(params)
     var xOffset = +200;
     var rohrOben = rohrObenPrototyp.clone({
         x: params.x + xOffset,
-        y: params.y1 + randomNumber
+        y: params.y1 + randomNumber,
+		height: 350,
+		width: 45,
+		type: 0,
+		punkte: false
     });
 
     var rohrUnten = rohrUntenPrototyp.clone({
        x: params.x + xOffset,
-       y: params.y2 + randomNumber
+       y: params.y2 + randomNumber,
+	   height: 350,
+	   width: 45,
+	   type: 1,
+	   punkte: false
     });
 
     rohre.push([rohrOben,rohrUnten]);
@@ -86,7 +100,7 @@ function rohrErstellen(params)
     spielfeld.addChild(rohrUnten);
 }
 
-for(var i = 0; i<=5; i++)
+for(var i = 0; i<4; i++)
 {
     if(i==0){
         rohrErstellen({
@@ -157,8 +171,38 @@ var bewegungen = function() {
   if(GAME) {
       for (var i = 0; i < rohre.length; i++) {
           for (var j = 0; j < rohre[i].length; j++) {
-              rohre[i][j].dx = -5;
+		  
+			if(rohre[i][j].x<0-45){
+			rohre[i][j].x+=735;
+			rohre[i][j].punkte = false;
+			}
+              rohre[i][j].dx = -7;
               rohre[i][j].x += rohre[i][j].dx;
+			  
+			  
+			// kollision
+			if(		(vogel.x + vogel.width - 10 >= rohre[i][j].x &&
+					vogel.y + vogel.height >= rohre[i][j].y &&
+					rohre[i][j].type === 1)
+					
+					||
+					
+					(vogel.x + vogel.width - 10 >= rohre[i][j].x &&
+					vogel.y <= rohre[i][j].y + rohre[i][j].height &&
+					rohre[i][j].type === 0)
+				)
+			{
+			    console.log("getroffen!");
+				GAME = false;
+			}
+			
+			
+			if(vogel.x >= rohre[i][j].x &&
+				rohre[i][j].punkte == false)
+			{
+				score += 0.5;
+				rohre[i][j].punkte = true;
+			}
           }
       }
   }
@@ -176,6 +220,12 @@ var abfragen = function() {
       vogel.y = boden.y - vogel.height;
       GAME = false; // gameover
       vogel.dy = 0;
+  }
+  
+  if(GAME == false && scoreGezeigt == false)
+  {
+	alert("Punktzahl: "+score);
+	scoreGezeigt = true;
   }
 };
 
