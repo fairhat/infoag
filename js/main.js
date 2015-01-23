@@ -224,8 +224,14 @@ var abfragen = function() {
   
   if(GAME == false && scoreGezeigt == false)
   {
-	alert("Punktzahl: "+score);
+	var dialog = confirm("Punktzahl: "+score);
 	scoreGezeigt = true;
+	
+	if(dialog)
+	{
+		location.reload();
+	}
+	
   }
 };
 
